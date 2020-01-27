@@ -41,17 +41,11 @@
 - name: Systemd | Create systemd service
   template:
       src: assign-ip.service.j2
-      dest: /etc/systemd/system/assign-ip.service
-      mode: '0644'
+      dest: /etc/init.d/assign-ip
+      mode: '0755'
       owner: 'root'
       group: 'root'
       
-- name: Systemd | Enable assign-ip
-  systemd:
-    enabled: yes
-    name: assign-ip
-    daemon_reload: yes
-
 - name: Start heartbeat
   systemd:
     state: restarted

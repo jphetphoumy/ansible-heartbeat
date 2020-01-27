@@ -1,10 +1,16 @@
-[Unit]
-Description=Service to assign floating ip
+#!/bin/bash
 
-[Service]
-Environment="DO_TOKEN={{do_token}}"
-Type=oneshot
-ExecStart=python /usr/local/bin/assign-ip {{ floating_ip }} {{ droplet_id }}
+param=$1
 
-[Install]
-WantedBy=multi-user.target
+export DO_TOKEN='{{do_token}}'
+
+if [ "start" == "$param" ]; then
+    python /usr/local/bin/assign-ip {{ floating_ip }} {{ droplet_id }}
+elif [ "stop" == "$param" ]; then
+    exit 0;
+elif [ "status" == "$param" ]; then
+    exit 0;
+else
+    echo "No such command $param"
+    exit 1;
+fi

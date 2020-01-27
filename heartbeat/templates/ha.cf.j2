@@ -1,4 +1,4 @@
-node web-primary
+node rabbitmq-primary
 ucast eth0 {{ groups['heartbeat_group'][0] }}
-node web-secondary
+node rabbitmq-secondary
 ucast eth0 {{ groups['heartbeat_group'][1] }}
