@@ -1,0 +1,4 @@
+node web-primary
+ucast eth0 {{ groups['heartbeat_group'][0] }}
+node web-secondary
+ucast eth0 {{ groups['heartbeat_group'][1] }}

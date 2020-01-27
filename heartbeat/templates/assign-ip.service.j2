@@ -1,0 +1,10 @@
+[Unit]
+Description=Service to assign floating ip
+
+[Service]
+Environment="DO_TOKEN={{do_token}}"
+Type=oneshot
+ExecStart=python /usr/local/bin/assign-ip {{ floating_ip }} {{ droplet_id }}
+
+[Install]
+WantedBy=multi-user.target

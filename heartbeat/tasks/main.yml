@@ -1,0 +1,58 @@
+---
+# tasks file for heartbeat
+
+- name: Install ha.cf
+  template:
+    src: ha.cf.j2
+    dest: /etc/ha.d/ha.cf
+
+- name: Config | Creater Authkeys
+  shell: dd if=/dev/urandom count=4 2>/dev/null | openssl dgst -sha1 | awk '{ print $2 }'
+  register: _drbd_heartbeat_authkeys
+
+- name: Config | Set fact
+  set_fact:
+    drbd_hearbeat_authkeys: "{{ _drbd_heartbeat_authkeys['stdout'] }}"
+
+- name: Install Authkeys
+  template:
+    src: authkeys.j2
+    dest: /etc/ha.d/authkeys
+    mode: '0600'
+    owner: 'root'
+    group: 'root'
+
+- name: Install haresources
+  template:
+    src: haresources.j2
+    dest: /etc/ha.d/haresources
+    mode: '0600'
+    owner: 'root'
+    group: 'root'
+
+- name: Floating ip | Assign ip script
+  copy:
+    src: assign-ip
+    dest: /usr/local/bin/assign-ip
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Systemd | Create systemd service
+  template:
+      src: assign-ip.service.j2
+      dest: /etc/systemd/system/assign-ip.service
+      mode: '0644'
+      owner: 'root'
+      group: 'root'
+      
+- name: Systemd | Enable assign-ip
+  systemd:
+    enabled: yes
+    name: assign-ip
+    daemon_reload: yes
+
+- name: Start heartbeat
+  systemd:
+    state: restarted
+    name: heartbeat
