@@ -1,0 +1,47 @@
+---
+- name: Setup | Install pip
+  apt:
+    name: python3-pip
+    state: present
+
+- name: Setup | Install docker-py
+  pip:
+    name: docker-py
+    executable: pip3
+    state: present
+
+- name: Pull rabbitmq Image managemenent
+  docker_image:
+    name: rabbitmq:3-management
+    source: pull
+
+# - name: Pull rabbitmq Imag
+#   docker_image:
+#     name: rabbitmq:3
+#     source: pull
+
+- name: Create rabbitmq network
+  docker_network:
+    name: rabbitmq
+
+- name: Start rabbitmq container node1
+  docker_container:
+    name: rabbitmq-node1
+    image: rabbitmq:3-management
+    networks:
+      - name: rabbitmq
+    env:
+      RABBITMQ_ERLANG_COOKIE: "secret_cookie"
+    ports:
+      - "8080:15672"
+      - "5672:5672"
+  when: '"primary" in ansible_hostname'
+
+# - name: Start rabbitmq container node2
+#   docker_container:
+#     name: rabbitmq-node2
+#     image: rabbitmq:3-management
+#     env:
+#       RABBITMQ_ERLANG_COOKIE: "secret_cookie"
+#     networks: 
+#       - name: rabbitmq

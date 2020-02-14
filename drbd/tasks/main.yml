@@ -1,0 +1,42 @@
+---
+# tasks file for drbd
+- name: Installation | Update and install drbd-util, ntp
+  apt:
+    name: ["drbd-utils", "ntp", "parted"]
+    update_cache: yes
+    state: present
+
+- name: Configuration | Edit hosts on {{ inventory_hostname }}
+  lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.1\.1'
+    line: "{{ inventory_hostname }} {{ hostname }}"
+
+# - name: Configuration | Create partition
+#   parted:
+#     device: /dev/sda
+#     number: 1
+#     state: present
+
+- name: Configuration | Create drbd r0 resource
+  template:
+    src: r0.res.j2
+    dest: /etc/drbd.d/r0.res
+    mode: '0600'
+    owner: 'root'
+    group: 'root'
+
+- name: Configuration | modprobe drbd module
+  modprobe:
+    name: drbd
+    state: present
+
+- name: Configuration | drbd create
+  shell: drbdadm create-md r0
+
+- name: Configuration | drbd bring device up
+  shell: drbdadm up r0
+
+- name: Configuration | Set drbd to primary
+  shell: drbdadm -- --overwrite-data-of-peer primary r0/0
+  when: '"primary" in ansible_hostname'

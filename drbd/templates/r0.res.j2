@@ -1,0 +1,15 @@
+resource r0 {
+    on rabbitmq-primary {
+        device /dev/drbd0;
+        disk /dev/disk/by-id/scsi-0DO_Volume_drbd0;
+        address {{ groups['heartbeat_group'][0] }}:7788;
+        meta-disk internal;
+    }
+
+    on rabbitmq-secondary {
+        device /dev/drbd0;
+        disk /dev/disk/by-id/scsi-0DO_Volume_drbd1;
+        address {{ groups['heartbeat_group'][1] }}:7788;
+        meta-disk internal;
+    }
+}

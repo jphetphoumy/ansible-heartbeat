@@ -6,13 +6,24 @@
     src: ha.cf.j2
     dest: /etc/ha.d/ha.cf
 
+- name: Config | Check authkeys
+  stat:
+    path: /etc/ha.d/authkeys
+  register: _stat_authkeys
+
+- name: Debug | Authkeys stat
+  debug:
+    var: "_stat_authkeys.stat.exists"
+
 - name: Config | Creater Authkeys
   shell: dd if=/dev/urandom count=4 2>/dev/null | openssl dgst -sha1 | awk '{ print $2 }'
   register: _drbd_heartbeat_authkeys
+  when: _stat_authkeys.stat.exists == false
 
 - name: Config | Set fact
   set_fact:
     drbd_hearbeat_authkeys: "{{ _drbd_heartbeat_authkeys['stdout'] }}"
+  when: _stat_authkeys.stat.exists == false
 
 - name: Install Authkeys
   template:
@@ -21,6 +32,7 @@
     mode: '0600'
     owner: 'root'
     group: 'root'
+  when: _stat_authkeys.stat.exists == false
 
 - name: Install haresources
   template:
