@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: heartbeat_group
   roles:
     - heartbeat
     - drbd

@@ -12,12 +12,6 @@
     regexp: '^127\.0\.1\.1'
     line: "{{ inventory_hostname }} {{ hostname }}"
 
-# - name: Configuration | Create partition
-#   parted:
-#     device: /dev/sda
-#     number: 1
-#     state: present
-
 - name: Configuration | Create drbd r0 resource
   template:
     src: r0.res.j2
@@ -40,3 +34,29 @@
 - name: Configuration | Set drbd to primary
   shell: drbdadm -- --overwrite-data-of-peer primary r0/0
   when: '"primary" in ansible_hostname'
+
+- name: Configuration | Set to ext4
+  shell: mkfs -t ext4 /dev/drbd0 
+  when: '"primary" in ansible_hostname'
+
+- name: Configuration | create /data
+  file:
+    path: /data
+    state: directory
+    owner: root
+    group: root
+
+- name: Mount /data
+  mount:
+    path: /data
+    src: /dev/drbd0
+    fstype: ext4
+    state: mounted
+  when: '"primary" in ansible_hostname'
+
+- name: fstab Mount /data
+  mount:
+    path: /data
+    src: /dev/drbd0
+    fstype: ext4
+    state: present

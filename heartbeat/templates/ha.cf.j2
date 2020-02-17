@@ -2,3 +2,4 @@ node rabbitmq-primary
 ucast eth0 {{ groups['heartbeat_group'][0] }}
 node rabbitmq-secondary
 ucast eth0 {{ groups['heartbeat_group'][1] }}
+auto_failback on

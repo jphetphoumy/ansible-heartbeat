@@ -24,18 +24,29 @@
   docker_network:
     name: rabbitmq
 
-- name: Start rabbitmq container node1
+- name: Create rabbitmq container node1
   docker_container:
     name: rabbitmq-node1
     image: rabbitmq:3-management
+    hostname: "node1"
     networks:
       - name: rabbitmq
     env:
       RABBITMQ_ERLANG_COOKIE: "secret_cookie"
+      RABBITMQ_NODENAME: "rabbitmq"
     ports:
       - "8080:15672"
       - "5672:5672"
-  when: '"primary" in ansible_hostname'
+    volumes:
+      - /data/rabbitmq:/var/lib/rabbitmq
+    state: present
+
+- name: Start Rabbitmq container
+  docker_container:
+    name: rabbitmq-node1
+    image: rabbitmq:3-management
+    state: started
+  when: "'floating_ip' in group_names"
 
 # - name: Start rabbitmq container node2
 #   docker_container:

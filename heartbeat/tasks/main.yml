@@ -50,6 +50,14 @@
     group: root
     mode: '0755'
 
+- name: RabbitMQ | RabbitMQ Script
+  copy:
+    src: RabbitMQ
+    dest: /etc/ha.d/resource.d/RabbitMQ
+    owner: root
+    group: root
+    mode: '0755'
+
 - name: Systemd | Create systemd service
   template:
       src: assign-ip.service.j2

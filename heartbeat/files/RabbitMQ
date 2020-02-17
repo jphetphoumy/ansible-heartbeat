@@ -1,0 +1,15 @@
+#!/bin/bash
+
+param=$1
+
+if [ "start" == "$param" ]; then
+        docker start rabbitmq-node1
+elif [ "stop" == "$param" ]; then
+        docker stop rabbitmq-node1
+    exit 0;
+elif [ "status" == "$param" ]; then
+    exit 0;
+else
+    echo "No such command $param"
+    exit 1;
+fi
